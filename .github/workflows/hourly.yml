@@ -1,0 +1,33 @@
+name: Hourly Recurrence
+
+on: 
+  schedule:
+    - cron: "0 * * * *"  #every hour
+  workflow_dispatch:
+
+jobs:
+  log_time:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Call API and log output
+        run: python test.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add api_output.log
+          git commit -m "Hourly API log" || echo "No changes"
+          git push
